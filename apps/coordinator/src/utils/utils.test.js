@@ -1,4 +1,4 @@
-import assert from "assert";
+import { describe, it, expect, beforeEach } from "vitest";
 import BigNumber from "bignumber.js";
 import {
   TEST_FIXTURES,
@@ -57,19 +57,18 @@ describe("utils", () => {
 
         // this would be a perfect spend all where the difference between
         // wallet balance and outputs is equal to fees
-        assert.equal(
+        expect(
           isSpendAll({ ...config, walletBalance }),
-          true,
           `Should be true for ${addressType}, ${numInputs} inputs and ${numOutputs} outputs`,
-        );
+        ).toBe(true);
+
         // check for a difference that is less than dust amount
         walletBalance = walletBalance.plus(Math.ceil(DUST_IN_SATOSHIS / 2));
 
-        assert.equal(
+        expect(
           isSpendAll({ ...config, walletBalance }),
-          true,
           `Should be true for ${addressType}, ${numInputs} inputs and ${numOutputs} outputs when difference is dust`,
-        );
+        ).toBe(true);
       });
     });
 
@@ -77,11 +76,10 @@ describe("utils", () => {
       TEST_FIXTURES.multisigs.forEach((fixture) => {
         const config = getConfig(fixture, feesPerByteInSatoshis);
         const walletBalance = config.outputTotal.multipliedBy(2).toFixed();
-        assert.equal(
+        expect(
           isSpendAll({ ...config, walletBalance }),
-          false,
           `Should be false for ${config.addressType}, ${walletBalance} wallet balance and ${config.outputTotal} output value`,
-        );
+        ).toBe(false);
       });
     });
 
@@ -225,14 +223,14 @@ describe("utils", () => {
       const slicesBalance = slices[0].balanceSats.plus(slices[1].balanceSats);
 
       // sanity check, esp in case fixtures change for some reason
-      assert(
+      expect(
         slicesBalance
           .minus(fee)
           .minus(output.amountSats)
           .isGreaterThan(DUST_IN_SATOSHIS),
         `Test slices balance amount minus fee and output
  should be greater than dust so that change is required`,
-      );
+      ).toBe(true);
 
       options.outputs = [output];
 
